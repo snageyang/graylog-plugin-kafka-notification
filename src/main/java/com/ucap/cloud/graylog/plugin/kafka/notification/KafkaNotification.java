@@ -46,6 +46,7 @@ public class KafkaNotification implements EventNotification {
         final KafkaEventNotificationConfig config = (KafkaEventNotificationConfig) ctx.notificationConfig();
         String bootstrapServers = config.bootstrapServers();
         String topic = config.topic();
+        //仅用于测试
         String content = config.content();
         int batchSize = config.batchSize();
         int lingerMs = config.lingerMs();
