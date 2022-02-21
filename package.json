@@ -23,6 +23,6 @@
   "dependencies": {
   },
   "devDependencies": {
-    "graylog-web-plugin": "file:../graylog2-server-4.2.1/graylog2-web-interface/packages/graylog-web-plugin"
+    "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin"
   }
 }
