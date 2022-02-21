@@ -17,11 +17,13 @@
 package com.ucap.cloud.graylog.plugin.kafka.notification;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ucap.cloud.graylog.plugin.kafka.notification.entity.KafkaEventNotificationConfig;
 import com.ucap.cloud.graylog.plugin.kafka.notification.util.KafkaUtil;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationException;
+import org.graylog.events.processor.EventDefinitionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,7 @@ public class KafkaNotification implements EventNotification {
 
     @Override
     public void execute(EventNotificationContext ctx) throws EventNotificationException {
+
         /* 获得需要的参数 */
         final KafkaEventNotificationConfig config = (KafkaEventNotificationConfig) ctx.notificationConfig();
         String bootstrapServers = config.bootstrapServers();
@@ -51,6 +54,17 @@ public class KafkaNotification implements EventNotification {
         int batchSize = config.batchSize();
         int lingerMs = config.lingerMs();
         Map fieldsMap = ctx.event().fields();
+        EventDefinitionDto definitionDto = ctx.eventDefinition().get();
+        String description = definitionDto.description();
+        try {
+            JSONObject jsonObject = JSON.parseObject(description);
+            for (String key : jsonObject.keySet()) {
+                Object value = jsonObject.get(key);
+                fieldsMap.put(key, value);
+            }
+        } catch (Exception e) {
+            log.error("JSON fail to  parseObject," + e.getLocalizedMessage());
+        }
         String message = JSON.toJSONString(fieldsMap);
         KafkaUtil.send(bootstrapServers, topic, message, batchSize, lingerMs);
     }
